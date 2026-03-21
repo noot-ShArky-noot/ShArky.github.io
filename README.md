@@ -1,3 +1,3 @@
 # ShArky.github.io
-For 程式設計課段考
+For 程式設計課段考\n
 also a test about how to utilize github better
