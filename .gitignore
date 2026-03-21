@@ -57,5 +57,5 @@ dkms.conf
 # Editor settings
 .vscode/
 
-# 忽略用於交作業的docx
-20260305HW\B11400002 余承翰 四工程一A.docx
+# 忽略用於交作業的docx(所有docx都不會被上傳到github)
+*.docx
