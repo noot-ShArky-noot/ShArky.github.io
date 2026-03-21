@@ -1,0 +1,11 @@
+{
+    "C_Cpp.default.compilerPath": "F:\\MSYS2\\ucrt64\\bin\\gcc.exe",
+    "terminal.integrated.profiles.windows": {
+    "Command Prompt": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "args": ["/k", "chcp 65001"]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminalErrorSound.volume": 0.3
+}
