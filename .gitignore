@@ -57,5 +57,6 @@ dkms.conf
 # Editor settings
 .vscode/
 
-# 忽略用於交作業的docx(所有docx都不會被上傳到github)
+# 忽略用於交作業的docx 還有編譯出的 exe檔案
 *.docx
+*.exe
