@@ -5,13 +5,13 @@ int main() {
     int a, b, c;
 
     a= 5;
-    b= 6;
+    b= 13;
     c= 12;
 
-    if ((a+b)<c) {
-        printf("This will not make a triangle");
+    if ((a+b)>c && (b+c)>a && (c+a)>b) {
+        printf("This will make a triangle");
     }
     else {
-        printf("This will make a triangle");
+        printf("This will not make a triangle");
     }
 }
