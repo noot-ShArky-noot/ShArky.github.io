@@ -1,0 +1,10 @@
+Pets 55 12
+Wang 33 34
+Lee 77 56
+Hwang 22 78
+Hung 88 90
+Su 99 9
+Sian 11 87
+Gau 0 65
+Lin 44 43
+Sun 66 21
