@@ -1,6 +1,9 @@
-Hank 6 85
+Hank 5 85
 Alice 2 80
 Grace 4 90
 Cindy 1 100
-David 5 70
+Zed 8 10
+Fizz 9 20
+David 6 70
 Bob 3 60
+Jim 7 75

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//note that the two function below is destructive to the original list so make sure to always copy the list first
+
 typedef struct node {
     char name[20];
     int num;
@@ -11,6 +13,7 @@ typedef struct node {
 void display(Node *head);
 Node* sortbynum(Node *head);
 Node* sortbyscore(Node *head);
+Node* copylist(Node *head);
 
 int main() {
     FILE *fp=fopen("SortVia.txt", "r");
@@ -37,9 +40,9 @@ int main() {
         cur->next = NULL;
     }
 
-    display(sortbynum(head));
+    //display(sortbynum(copylist(head)));
     printf("\n");
-    display(sortbyscore(head));
+    display(sortbyscore(copylist(head)));
 
     fclose(fp);
 }
@@ -52,6 +55,34 @@ void display(Node *head) {
         printf("Num:%d Name:%10s Score:%d ->\n", cur->num, cur->name, cur->score);
     }
     puts("NULL");
+}
+
+Node* copylist(Node *head) {
+    if(head==NULL) return NULL;
+
+    Node *newhead=NULL;
+    Node *tail=NULL;
+    Node *cur=head;   //skip dummyhead
+
+    while(cur!=NULL) {
+        Node *newnode=malloc(sizeof(Node));
+
+        strcpy(newnode->name, cur->name);
+        newnode->num=cur->num;
+        newnode->score=cur->score;
+        newnode->next=NULL;
+
+        if(newhead==NULL) {
+            newhead=newnode;
+            tail=newnode;
+        }
+        else {
+            tail->next=newnode;
+            tail=newnode;
+        }
+        cur=cur->next;
+    }
+    return newhead;
 }
 
 Node* sortbynum(Node *head) { //from 1 to n...(min to max)
@@ -100,48 +131,54 @@ Node* sortbynum(Node *head) { //from 1 to n...(min to max)
     return sorted;  //return the sorted list
 }
 
-Node* sortbyscore(Node *head) { //from 1 to n...(min to max)
-    Node *sorted=NULL;  //create new sorted list (no node yet)
+Node* sortbyscore(Node *head) {
+    Node *sorted = NULL;
+    // skip dummy head
+    head = head->next;
+    while (head != NULL) {
 
-    while(head!=NULL) { //if there is still node in the "unsorted list" then keep doing
-        Node *max=head; //current minimal node
-        Node *maxprev=NULL; //the node before min (this node is used to delete the node we want to delete)
-        Node *cur=head; //node for traversal
-        Node *prev=NULL;    //the node before current
+        Node *max = head;
+        Node *maxprev = NULL;
+        Node *cur = head;
+        Node *prev = NULL;
 
-        //FIND MAX
-        while(cur!=NULL) {  //traverse the unsorted list
-            if(cur->score > max->score) {   //if there is value larger than max
-                max=cur;    //update max
-                maxprev=prev;   //update maxprev
+        // find node with highest score
+        while (cur != NULL) {
+            if (cur->score > max->score) {
+                max = cur;
+                maxprev = prev;
             }
-            prev=cur;   //just path towards the next node normally
-            cur=cur->next;  //same for cur
+            prev = cur;
+            cur = cur->next;
         }
-
-        //remove min from origin
-        //situation 1: min is head
-        if(maxprev==NULL) { //this means min is the first node
-            head=head->next;    //move head to next (equals to deleting the first node)
+        // remove max from list
+        if (maxprev == NULL) {
+            // max is first
+            head = head->next;
         }
-        //situation 2: min is in middle or last
         else {
-            maxprev->next=max->next;    //skip min and then link previous node to the next node
-        }   //minprev -> min -> next        minprev->next
-
-        //link min to sorted
-        max->next=NULL; //make min link to null first just in case
-        if(sorted==NULL) {  //situation 1: sorted is null
-            sorted=max; //
+            // max in middle or end
+            maxprev->next = max->next;
         }
-        else {  //situation 2: sorted already has nodes
-            Node *t=sorted; //Node t is used to traverse to the end of the list
+        max->next=NULL;
+
+        //from low to high
+        //max->next = sorted;
+        //sorted = max;
+
+        //from high to low
+        if(sorted==NULL) {
+            sorted=max;
+            sorted->next=NULL;
+        }
+        else {
+            Node *t=sorted;
             while(t->next!=NULL) {
                 t=t->next;
             }
-            t->next=max;    //link min to the end of the list
+            t->next=max;
+            max->next=NULL;
         }
     }
-    //every round: (1)find min in unsorted (2)remove from unsorted (3)link to sorted
-    return sorted;  //return the sorted list
+    return sorted;
 }

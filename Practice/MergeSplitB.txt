@@ -1,0 +1,5 @@
+2 Zed 2 10
+2 Fizz 5 20
+2 David 1 70
+2 Bob 3 60
+2 Jim 4 75
