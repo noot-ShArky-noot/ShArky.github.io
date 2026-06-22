@@ -7,7 +7,7 @@ void display(unsigned int num);
 
 int main() {
     int num=0b10000000;
-    /*while(1) {
+    /*while(1) {    //10000000 -> 01000000 -> ... -> 00000001
         if(num==0) {
             num=0b10000000;
         }
@@ -17,7 +17,7 @@ int main() {
         for(int i=0; i<1e9; i++);
     }*/
 
-    while(1) {
+    while(1) {  //chess display
         display(170);
         Sleep(1000);
         fflush(stdout);
