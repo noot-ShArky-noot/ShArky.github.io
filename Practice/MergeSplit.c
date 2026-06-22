@@ -70,6 +70,23 @@ void swap(Node *a, Node *b) {
     b->score = tscore;
 }
 
+/* =================== sort by avg ===================*/
+float totalAvgScore1(Node *head)
+{
+    int sum = 0;
+    int count = 0;
+
+    while (head != NULL) {
+        sum += head->score;
+        count++;
+        head = head->next;
+    }
+
+    if (count == 0) return 0;  // 避免除以 0
+
+    return (float)sum / count;
+}
+
 /* ================== sort by class ================== */
 void sortByClass(Node *head) {
     for (Node *i = head; i != NULL; i = i->next)
@@ -171,3 +188,38 @@ int main() {
 
     return 0;
 }
+
+/* avg for single person
+float avg(Node *n)
+{
+    return (n->score1 + n->score2) / 2.0;
+}
+
+usage: use it in display()
+*/
+
+/*
+total avg
+
+float totalAvg(Node *head)
+{
+    int sum = 0;
+    int count = 0;
+
+    while (head != NULL) {
+        sum += head->score1 + head->score2;
+        count += 2;
+        head = head->next;
+    }
+
+    return (float)sum / count;
+}
+*/
+
+/*
+sort by personal avg
+if (avg(i) < avg(j)) swap(i, j);
+
+keep those >60
+if (avg(node) > 60) insert(...)
+*/
