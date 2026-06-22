@@ -17,7 +17,28 @@ int main() {
         for(int i=0; i<1e9; i++);
     }*/
 
-    while(1) {  //chess display
+    display(num);
+    Sleep(100);
+    fflush(stdout);
+    printf("\r");
+    while(1) {
+        while(num!=1) {
+            num>>=1;
+            display(num);
+            Sleep(100);
+            fflush(stdout);
+            printf("\r");
+        }
+        while(num!=0b10000000) {
+            num<<=1;
+            display(num);
+            Sleep(100);
+            fflush(stdout);
+            printf("\r");
+        }
+    }
+
+    /*while(1) {  //chess display
         display(170);
         Sleep(1000);
         fflush(stdout);
@@ -29,7 +50,7 @@ int main() {
         fflush(stdout);
 
         printf("\r");
-    }
+    }*/
 }
 void display(unsigned int num) {
     int i;
