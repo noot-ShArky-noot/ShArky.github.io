@@ -1,0 +1,6 @@
+Hank 6 85
+Alice 2 80
+Grace 4 90
+Cindy 1 100
+David 5 70
+Bob 3 60
