@@ -1,0 +1,486 @@
+🟢 一、有緩衝區（Buffered I/O / stdio.h）
+
+👉 最常用（考試 + 作業 90% 都是這個）
+
+#include <stdio.h>
+📌 1. 開檔 fopen
+FILE *fp = fopen("file.txt", "mode");
+🔥 mode（超重要）
+mode	意思
+"r"	讀（檔案要存在）
+"w"	寫（會清空原檔）
+"a"	追加
+"r+"	讀寫（檔案要存在）
+"w+"	讀寫（清空）
+"a+"	讀寫（追加）
+📌 二進位版本（很常考）
+mode	意思
+"rb", "wb", "ab"	binary
+📌 2. 關檔 fclose
+fclose(fp);
+
+👉 一定要關，不然資料可能沒寫進去（buffer還在）
+
+📌 3. 字元讀寫
+🔹 單字元寫入
+fputc('A', fp);
+🔹 單字元讀取
+char c = fgetc(fp);
+
+👉 讀到 EOF（-1）表示結束
+
+📌 4. 字串讀寫（超常考）
+🔹 寫字串
+fputs("hello\n", fp);
+🔹 讀字串
+char str[100];
+fgets(str, 100, fp);
+
+👉 fgets 會保留 '\n'
+
+📌 5. 格式化輸入輸出（最重要）
+🔹 fprintf（寫檔）
+fprintf(fp, "%d %s %.2f\n", id, name, score);
+🔹 fscanf（讀檔）
+fscanf(fp, "%d %s %f", &id, name, &score);
+
+⚠️ 注意：
+
+fscanf 遇空白/換行會分隔
+不適合讀複雜格式（容易炸）
+📌 6. EOF 判斷（超常考）
+while (fscanf(fp, "%d", &x) != EOF)
+
+或
+
+while (fgets(buf, 100, fp) != NULL)
+📌 7. 檔案指標控制
+fseek(fp, offset, origin);
+origin：
+值	意思
+SEEK_SET	開頭
+SEEK_CUR	目前位置
+SEEK_END	結尾
+📌 取得位置
+long pos = ftell(fp);
+📌 回到開頭
+rewind(fp);
+📌 8. 錯誤檢查
+if (fp == NULL) {
+    printf("open failed\n");
+}
+🔴 二、無緩衝區（Unbuffered I/O / system calls）
+
+👉 比較底層（作業系統層級）
+
+#include <fcntl.h>
+#include <unistd.h>
+📌 1. 開檔 open
+int fd = open("file.txt", O_RDONLY);
+mode：
+flag	意思
+O_RDONLY	只讀
+O_WRONLY	只寫
+O_RDWR	讀寫
+O_CREAT	不存在就建立
+O_TRUNC	清空
+O_APPEND	追加
+🔥 常見組合
+open("a.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+👉 0644 是權限
+
+📌 2. 關檔 close
+close(fd);
+📌 3. 讀寫（核心）
+🔹 write
+write(fd, buffer, size);
+🔹 read
+read(fd, buffer, size);
+📌 範例
+char buf[100];
+
+int n = read(fd, buf, 100);
+write(1, buf, n);  // 1 = stdout
+📌 4. 特點（超重要考點）
+
+✔ 沒 buffer
+✔ 直接 system call
+✔ 比較快但麻煩
+✔ 不會幫你處理字串格式
+
+🟡 三、Buffered vs Unbuffered 差異（必考）
+項目	stdio (fopen)	system call (open)
+buffer	有	沒有
+函式	fprintf / fgets	write / read
+複雜度	低	高
+效能	快（因 buffer）	更直接
+使用情境	一般程式	OS / 系統程式
+🧠 四、buffer（緩衝區）到底是什麼？
+
+👉 觀念一定要懂：
+
+🔹 沒 buffer
+寫一次 → 系統一次 I/O
+🔹 有 buffer
+先放記憶體
+滿了 or fclose 才寫入磁碟
+
+👉 所以：
+
+fprintf 不一定立刻寫入
+fclose 才保證寫完
+⚠️ 五、超常見錯誤
+❌ 1. 忘記 fclose
+
+→ 資料消失
+
+❌ 2. fopen 沒檢查 NULL
+
+→ crash
+
+❌ 3. fscanf 讀到錯誤還繼續跑
+
+→ 無限 loop
+
+❌ 4. fgets 沒處理 '\n'
+
+→ 字串比想像長
+
+❌ 5. write/read 當 fprintf 用
+
+→ 格式錯亂
+
+🧾 六、考試最常用模板
+📌 讀檔
+FILE *fp = fopen("in.txt", "r");
+
+int x;
+while (fscanf(fp, "%d", &x) != EOF) {
+    printf("%d\n", x);
+}
+
+fclose(fp);
+📌 寫檔
+FILE *fp = fopen("out.txt", "w");
+
+fprintf(fp, "Hello %d\n", 10);
+
+fclose(fp);
+📌 line-by-line
+char buf[100];
+
+while (fgets(buf, 100, fp) != NULL) {
+    printf("%s", buf);
+}
+
+🧾 🔥 C File I/O 考試 Top 10 題型＋模板
+1️⃣ 📌 逐行讀檔並輸出
+🧪 題型
+
+讀一個檔案，逐行印出內容
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+char buf[100];
+
+while (fgets(buf, sizeof(buf), fp) != NULL) {
+    printf("%s", buf);
+}
+
+fclose(fp);
+2️⃣ 📌 讀數字直到 EOF
+🧪 題型
+
+檔案內有一堆整數，全部讀出來
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+int x;
+
+while (fscanf(fp, "%d", &x) != EOF) {
+    printf("%d\n", x);
+}
+
+fclose(fp);
+3️⃣ 📌 計算總和 / 平均
+🧪 題型
+
+檔案存很多分數，算 sum / avg
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+int x;
+int sum = 0, cnt = 0;
+
+while (fscanf(fp, "%d", &x) != EOF) {
+    sum += x;
+    cnt++;
+}
+
+printf("sum=%d avg=%.2f\n", sum, (double)sum / cnt);
+
+fclose(fp);
+4️⃣ 📌 找最大 / 最小值
+🧪 題型
+
+找檔案中的 max / min
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+int x;
+fscanf(fp, "%d", &x);
+
+int max = x;
+
+while (fscanf(fp, "%d", &x) != EOF) {
+    if (x > max) max = x;
+}
+
+printf("max=%d\n", max);
+
+fclose(fp);
+5️⃣ 📌 字串逐行處理（很常考）
+🧪 題型
+
+讀檔每一行做處理（例如 count / search）
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+char buf[100];
+
+while (fgets(buf, sizeof(buf), fp)) {
+    // process line
+    printf("line: %s", buf);
+}
+
+fclose(fp);
+6️⃣ 📌 統計字元數 / 行數
+🧪 題型
+
+算檔案有幾行 / 幾個字元
+
+🧠 模板（行數）
+int lines = 0;
+char buf[100];
+
+while (fgets(buf, sizeof(buf), fp)) {
+    lines++;
+}
+🧠 模板（字元數）
+int cnt = 0;
+char c;
+
+while ((c = fgetc(fp)) != EOF) {
+    cnt++;
+}
+7️⃣ 📌 複製檔案（超常考）
+🧪 題型
+
+file A → copy → file B
+
+🧠 模板
+FILE *in = fopen("a.txt", "r");
+FILE *out = fopen("b.txt", "w");
+
+char buf[100];
+
+while (fgets(buf, sizeof(buf), in)) {
+    fputs(buf, out);
+}
+
+fclose(in);
+fclose(out);
+8️⃣ 📌 格式化資料讀寫（struct-like）
+🧪 題型
+
+id name score 存檔與讀取
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+int id;
+char name[20];
+float score;
+
+while (fscanf(fp, "%d %s %f", &id, name, &score) != EOF) {
+    printf("%d %s %.2f\n", id, name, score);
+}
+
+fclose(fp);
+9️⃣ 📌 找特定條件資料（filter）
+🧪 題型
+
+找分數 > 80 或符合條件的人
+
+🧠 模板
+FILE *fp = fopen("in.txt", "r");
+
+int id;
+char name[20];
+float score;
+
+while (fscanf(fp, "%d %s %f", &id, name, &score) != EOF) {
+    if (score > 80) {
+        printf("%s %.2f\n", name, score);
+    }
+}
+
+fclose(fp);
+🔟 📌 用 fseek / ftell（檔案指標題）
+🧪 題型
+
+跳到檔案某位置 / 回頭讀 / 反覆讀
+
+🧠 模板
+🔹 回到開頭重讀
+rewind(fp);
+🔹 移動指標
+fseek(fp, 0, SEEK_SET);
+🔹 取得位置
+long pos = ftell(fp);
+printf("%ld\n", pos);
+⚡ BONUS（老師很愛出陷阱）
+⚠️ fscanf 正確寫法
+while (fscanf(fp, "%d", &x) != EOF)
+
+❌ 錯誤：
+
+while (!feof(fp))  // 很危險
+⚠️ fgets 一定要 buffer
+char buf[100]; // 必須
+⚠️ fopen 一定要檢查
+if (fp == NULL) {
+    printf("open failed");
+    return 1;
+}
+🧠 一頁總結（考試速記）
+
+👉 90% 題型其實都是這四種：
+
+1. fgets + loop   → 逐行
+2. fscanf + loop  → 數字/資料
+3. fputs/fprintf  → 輸出
+4. copy pattern   → 檔案搬運
+
+cipher/de-cipher
+
+#include <stdio.h>
+
+int main() {
+    FILE *in = fopen("plain.bin", "rb");
+    FILE *out = fopen("encrypted.bin", "wb");
+
+    if (!in || !out) return 1;
+
+    unsigned char c;
+    unsigned char key = 0x5A;  // 加密 key（可改）
+
+    while (fread(&c, 1, 1, in) == 1) {
+        c = c ^ key;
+        fwrite(&c, 1, 1, out);
+    }
+
+    fclose(in);
+    fclose(out);
+}
+
+🧠 一、什麼是 byte shift？
+📌 概念一句話
+byte shift = 把資料以「整個 byte（1 byte = 8 bit）」為單位往左或右移
+📌 與 bit shift 差別
+類型	單位	影響
+bit shift	1 bit	c << 1
+byte shift	1 byte	buffer[i] ↔ buffer[i+1]
+🔥 二、最常見考法：buffer byte shift
+📌 1. 向右 shift（整體往後移）
+🧪 加密
+[ A ][ B ][ C ][ D ]
+→
+[ ? ][ A ][ B ][ C ]
+
+👉 D 被丟掉 or 存起來
+
+🧠 C 寫法
+for (int i = n - 1; i > 0; i--) {
+    buf[i] = buf[i - 1];
+}
+buf[0] = 0; // 或 key
+📌 2. 向左 shift（往前移）
+🧪 解密方向
+[ A ][ B ][ C ][ D ]
+→
+[ B ][ C ][ D ][ ? ]
+🧠 C 寫法
+for (int i = 0; i < n - 1; i++) {
+    buf[i] = buf[i + 1];
+}
+buf[n - 1] = 0;
+🔐 三、考試最常見：byte shift + key
+📌 加密（右 shift + key）
+for (int i = n - 1; i > 0; i--) {
+    buf[i] = buf[i - 1];
+}
+buf[0] = key;
+📌 解密（左 shift + 移除 key）
+for (int i = 0; i < n - 1; i++) {
+    buf[i] = buf[i + 1];
+}
+buf[n - 1] = 0;
+🔥 四、進階版本（考高分用）
+📌 circular byte shift（循環位移）
+
+👉 這個最常出現在「加密題」
+
+🧪 加密（右旋 byte）
+unsigned char temp = buf[n - 1];
+
+for (int i = n - 1; i > 0; i--) {
+    buf[i] = buf[i - 1];
+}
+buf[0] = temp;
+🧠 解密（左旋 byte）
+unsigned char temp = buf[0];
+
+for (int i = 0; i < n - 1; i++) {
+    buf[i] = buf[i + 1];
+}
+buf[n - 1] = temp;
+
+👉 這個是「完全可逆」✔
+
+🧠 五、byte shift vs bit shift（超重要）
+📌 bit shift
+10101010 << 1
+
+👉 改變 bit 結構
+
+📌 byte shift
+[A][B][C][D] → [D][A][B][C]
+
+👉 改變「資料順序」
+
+⚠️ 六、老師最愛考的坑
+❌ 1. 以為 byte shift = bit shift
+
+👉 完全不同
+
+❌ 2. 忘記資料會被覆蓋
+buf[i] = buf[i - 1]; // 會覆蓋原值
+
+👉 通常要先存 temp
+
+❌ 3. index 寫錯（超常錯）
+for (i = n; i >= 0; i--) // ❌ 爆
+
+✔ 正確：
+
+for (i = n - 1; i > 0; i--)
+🧠 七、一句話總結（考試必背）
+byte shift = 陣列位移（整體搬家）
+bit shift = 單一 byte 的 bit 改變
